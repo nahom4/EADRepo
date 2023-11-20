@@ -5,7 +5,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,33 +33,35 @@ public class ViewEmployeeServlet extends HttpServlet {
 			String query = "select * from employee";
 			PreparedStatement pt = conn.prepareStatement(query);
 			ResultSet rs = pt.executeQuery();
+			RequestDispatcher dispatcher = req.getRequestDispatcher("ViewPage.jsp");
 			
-			res.setContentType("text/html");
-			pw.print("<html>");
-			pw.print("<head>");
-			pw.print("<link rel = \"stylesheet\" href =\"CSS/bootstrap.css\">");
-			
-			pw.print("</head>");
-			pw.print("<body>");
-			pw.print("<h2>Employee Table</h2>");
-			pw.print("<table>");
-			pw.print("<tr>");
-			pw.print("<td>" + "Name" + "</td>");
-			pw.print("<td>" + "Designation" + "</td>");
-			pw.print("<td>" + "Salary" + "</td>");
-			pw.print("</tr>");
-			while (rs.next()) {
-				
-				pw.print("<tr>");
-				pw.print("<td>" + rs.getString(2) + "</td>");
-				pw.print("<td>" + rs.getString(3) + "</td>");
-				pw.print("<td>" + rs.getFloat(4) + "</td>");
-				pw.println("<td><a href ='edit?id=" + rs.getInt(1) + "'>edit</a></td>");
-				pw.println("<td><a href ='delete?id=" + rs.getInt(1) +"'>delete</a></td>");
-						pw.println("</tr>");
-				pw.print("</tr>");
-				
+			List<String> columnNames = new ArrayList<>();
+			List<List<Object>> rows = new ArrayList<>();
+
+			ResultSetMetaData metaData = rs.getMetaData();
+
+			// Extract column names
+			int columnCount = metaData.getColumnCount();
+			for (int i = 1; i <= columnCount; i++) {
+			    columnNames.add(metaData.getColumnName(i));
 			}
+
+			// Extract rows
+			while (rs.next()) {
+			    List<Object> row = new ArrayList<>();
+			    for (int i = 1; i <= columnCount; i++) {
+			        row.add(rs.getObject(i));
+			    }
+			    rows.add(row);
+			}
+
+			System.out.print(columnNames);
+			// Set these lists as attributes in the request or another suitable scope
+			req.setAttribute("columnNames", columnNames);
+			req.setAttribute("rows", rows);
+
+	
+			dispatcher.forward(req, res);
 			
 		}catch (Exception e) {
 			e.printStackTrace();

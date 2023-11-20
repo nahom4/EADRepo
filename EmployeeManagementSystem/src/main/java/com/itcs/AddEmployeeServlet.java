@@ -25,7 +25,6 @@ public class AddEmployeeServlet extends HttpServlet {
 			PrintWriter pw = res.getWriter();
 			String query = "insert into employee(name, designation, sallary)values(?, ?, ?)";
 			PreparedStatement pt  = conn.prepareStatement(query);
-			System.out.print("works fine");
 			String name = req.getParameter("name");
 			String designation = req.getParameter("designation");
 			float salary = Float.parseFloat(req.getParameter("salary"));
@@ -33,7 +32,9 @@ public class AddEmployeeServlet extends HttpServlet {
 			pt.setString(2, designation);
 			pt.setFloat(3, salary);
 			int val = pt.executeUpdate();
-			System.out.print(val);
+			
+			res.sendRedirect(req.getContextPath() + "/AddEmployee.html");
+			
 		}catch (Exception e) {
 			e.printStackTrace();// TODO: handle exception
 		}

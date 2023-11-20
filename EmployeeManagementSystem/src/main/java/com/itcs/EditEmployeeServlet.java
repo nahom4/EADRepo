@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,7 @@ protected void doPost(HttpServletRequest req,HttpServletResponse res) {
 			
 			String name = req.getParameter("name");
 			String designation = req.getParameter("designation");
-			float salary = Float.parseFloat(req.getParameter("salary"));
+			float salary = Float.parseFloat(req.getParameter("sallary"));
 			PrintWriter pw = res.getWriter();
 		
 			String query = "UPDATE employee  SET name = ?, designation = ?, sallary = ? WHERE id = ?";
@@ -39,9 +40,11 @@ protected void doPost(HttpServletRequest req,HttpServletResponse res) {
 			pt.setFloat(3, salary);
 			pt.setInt(4, id);
 			int val = pt.executeUpdate();
+			
+//			RequestDispatcher dispatcher = req.getRequestDispatcher("/view");
 			if (val == 1) {
-				res.setContentType("text/html");
-				pw.print("<h>Updated succesfully</h>");
+				 res.sendRedirect(req.getContextPath() + "/view");
+				
 			}
 //		
 //			

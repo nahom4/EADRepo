@@ -5,7 +5,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,35 +35,25 @@ public class EditEmployeePageServlet extends HttpServlet {
 			String id = req.getParameter("id");
 			pt.setInt(1, Integer.parseInt(id));
 			ResultSet rs = pt.executeQuery();
+		
 			rs.next();
-			res.setContentType("text/html");
-			pw.println("<form action = 'editurl?id="+id+"' method = 'post'>");
-			pw.print("<table>");
-			pw.println("<tr>");
-			pw.println("<td>Name</td>");
-			pw.println("<td><input type = 'text', name ='name', value = '" + rs.getString(1)+"'</td>");
-
-			pw.println("</tr>");
-			pw.println("<tr>");
-			pw.println("<td>Designation</td>");
-			pw.println("<td><input type = 'text', name ='designation', value = '" + rs.getString(2)+"'</td>");
-
-			pw.println("</tr>");
-			pw.println("<tr>");
-			pw.println("<td>employeeSalary</td>");
-			pw.println("<td><input type = 'text', name ='salary', value = '" + rs.getFloat(3)+"'</td>");
-
-			pw.println("</tr>");
-			pw.println("<tr>");
-			pw.println("<td><input type = 'submit' value ='Edit'></td>");
-
-			pw.println("<td><input type = 'reset' value ='Cancel'></td>");
-
-			pw.println("</tr>");
-			pw.println("</table>");
-			pw.println("</form>");
-				
+			ResultSetMetaData metaData = rs.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			List<String> columnNames = new ArrayList<>();
 			
+			for(int i = 1; i <= columnCount; i++) {
+				columnNames.add(metaData.getColumnName(i));
+			}
+		    List<Object> details = new ArrayList<>();
+		    for (int i = 1; i <= columnCount; i++) {
+		        details.add(rs.getObject(i));
+		    }
+		    
+		    req.setAttribute("details", details);
+		    req.setAttribute("columnNames",columnNames);
+			req.setAttribute("id", id);		
+		    RequestDispatcher dispatch = req.getRequestDispatcher("EditPage.jsp");
+		    dispatch.forward(req, res);
 		}catch (Exception e) {
 			e.printStackTrace();// TODO: handle exception
 		}

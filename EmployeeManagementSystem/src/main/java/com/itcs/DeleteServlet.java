@@ -32,7 +32,8 @@ protected void doGet(HttpServletRequest req,HttpServletResponse res) {
 			PreparedStatement pt = conn.prepareStatement(query);
 			pt.setInt(1, id);
 			pt.executeUpdate();
-			pw.print("works so far");
+			
+			res.sendRedirect(req.getContextPath() + "/view");
 			
 			
 		}catch (Exception e) {
